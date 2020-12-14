@@ -17,6 +17,7 @@ from Bio import Entrez
 import networkx as nx
 import pandas as pd
 import matplotlib.pyplot as plt
+import sqlite3
 
 myquery = '"Solid dispersion"'
 Entrez.email = 'peterjanverheij@gmail.com'
@@ -64,6 +65,7 @@ def fetch_details_2(id):
 
 results = search(myquery,mymax)
 id_list = results['IdList'] # list of UIDs
+
 chunk_size = 50 # whatever you like   
 for chunk_i in range(0, len(id_list), chunk_size):
     chunk = id_list[chunk_i:chunk_i + chunk_size]
@@ -186,3 +188,9 @@ df2 = pd.DataFrame(data)
 
 
 df2.to_excel('output.xlsx') 
+conn = sqlite3.connect('TestDB1.db')
+c = conn.cursor()
+query = 'CREATE TABLE {queryname} {values}'
+#c.execute(query.format(queryname=myquery,values=tuple(data.keys())))
+conn.commit()
+df2.to_sql(myquery, conn, if_exists='replace', index=False)
